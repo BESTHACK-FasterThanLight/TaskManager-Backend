@@ -10,9 +10,10 @@ public interface ProjectDAO {
 
     Integer setProject(@NotNull Project project);
 
-    Integer deleteUserFromProject(@NotNull Integer projectId, @NotNull Integer userId);
-
-    Integer deleteProject(@NotNull Integer projectId);
+    void deleteProject(@NotNull Integer projectId);
 
     List<Project> getAllProjectsByUserId(@NotNull Integer userId);
+
+    Integer isProjectExist(Integer projectId);
+
 }

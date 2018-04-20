@@ -50,4 +50,11 @@ public class ProjectToUserService implements ProjectToUserDAO {
             return preparedStatement;
         });
     }
+
+    @Override
+    public Integer isUserHaveAcess(Integer projectId, Integer userId) {
+        final String sql = "SELECT count(*) FROM projects_to_users WHERE project_id = ? AND user_id = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{projectId, userId}, Integer.class);
+    }
+
 }

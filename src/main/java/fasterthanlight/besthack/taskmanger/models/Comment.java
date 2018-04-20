@@ -7,11 +7,17 @@ public class Comment {
     private Integer id;
     private String text;
     private String created;
+    private Integer taskId;
+    private Integer authorId;
+    private String authorLogin;
 
-    public Comment(@NotNull Integer id, @NotNull String text, @NotNull String created) {
+    public Comment(@NotNull Integer id, @NotNull String text, @NotNull String created, Integer taskId, Integer authorId, String authorLogin) {
         this.id = id;
         this.text = text;
         this.created = created;
+        this.taskId = taskId;
+        this.authorId = authorId;
+        this.authorLogin = authorLogin;
     }
 
     public Comment() {
@@ -42,6 +48,30 @@ public class Comment {
         this.id = id;
     }
 
+    public Integer getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(Integer taskId) {
+        this.taskId = taskId;
+    }
+
+    public Integer getAuthorId() {
+        return authorId;
+    }
+
+    public void setAuthorId(Integer authorId) {
+        this.authorId = authorId;
+    }
+
+    public String getAuthorLogin() {
+        return authorLogin;
+    }
+
+    public void setAuthorLogin(String authorLogin) {
+        this.authorLogin = authorLogin;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -49,12 +79,15 @@ public class Comment {
         Comment comment = (Comment) o;
         return Objects.equals(id, comment.id) &&
                 Objects.equals(text, comment.text) &&
-                Objects.equals(created, comment.created);
+                Objects.equals(created, comment.created) &&
+                Objects.equals(taskId, comment.taskId) &&
+                Objects.equals(authorId, comment.authorId) &&
+                Objects.equals(authorLogin, comment.authorLogin);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(id, text, created);
+        return Objects.hash(id, text, created, taskId, authorId, authorLogin);
     }
 }

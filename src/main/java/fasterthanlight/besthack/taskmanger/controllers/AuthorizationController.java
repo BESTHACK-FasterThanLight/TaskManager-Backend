@@ -17,8 +17,6 @@ import java.util.Objects;
 public class AuthorizationController {
     private final UserService userService;
     private final PasswordEncoder encoder;
-    @SuppressWarnings("WeakerAccess")
-
 
     public AuthorizationController(@NotNull UserService userService, @NotNull PasswordEncoder encoder) {
         super();

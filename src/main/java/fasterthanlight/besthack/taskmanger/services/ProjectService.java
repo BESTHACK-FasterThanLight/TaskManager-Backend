@@ -8,17 +8,16 @@ import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
 import java.sql.PreparedStatement;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ProjectService implements ProjectDAO {
     
     private JdbcTemplate jdbcTemplate;
-    private ProjectToUserService projectToUserService;
 
-    public ProjectService(JdbcTemplate jdbcTemplate, ProjectToUserService projectToUserService) {
+    public ProjectService(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.projectToUserService = projectToUserService;
     }
 
     @Override
@@ -37,9 +36,10 @@ public class ProjectService implements ProjectDAO {
     public Integer setProject(@NotNull Project newProject) {
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
+        final String sql = "insert into projects(project_name)" + " values(?)" + " returning id" ;
         jdbcTemplate.update(con -> {
             final PreparedStatement pst = con.prepareStatement(
-                    "insert into projects(project_name)" + " values(?)" + " returning id",
+                    sql,
                     PreparedStatement.RETURN_GENERATED_KEYS);
             pst.setString(1, newProject.getName());
             return pst;
@@ -47,19 +47,32 @@ public class ProjectService implements ProjectDAO {
         return keyHolder.getKey().intValue();
     }
 
-
     @Override
-    public Integer deleteUserFromProject(@NotNull Integer projectId, @NotNull Integer userId) {
-        return null;
-    }
-
-    @Override
-    public Integer deleteProject(@NotNull Integer projectId) {
-        return null;
+    public void deleteProject(@NotNull Integer projectId) {
+        final String sql = "DELETE FROM projects WHERE id = ?";
+        jdbcTemplate.update(con -> {
+            final PreparedStatement pst = con.prepareStatement(sql);
+            pst.setInt(1, projectId);
+            return pst;
+        });
     }
 
     @Override
     public List<Project> getAllProjectsByUserId(Integer userId) {
-        return null;
+        final String sql = "SELECT * FROM projects p JOIN projects_to_users pu ON (p.id = pu.id AND u.id = ?)";
+        return jdbcTemplate.queryForObject(sql, new Object[]{userId}, (rs, rwNumber) -> {
+            List<Project> projects = new ArrayList<>();
+            for (int i =0; i < rwNumber; i++){
+                Project project = new Project(rs.getInt("id"), rs.getString("project_name"));
+                projects.add(project);
+            }
+            return projects;
+        });
+    }
+
+    @Override
+    public Integer isProjectExist(Integer projectId) {
+        final String sql = "SELECT count(*) FROM projects WHERE id = ?";
+        return jdbcTemplate.queryForObject(sql, new Object[]{projectId}, Integer.class);
     }
 }

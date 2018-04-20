@@ -14,10 +14,18 @@ public enum ApiResponse {
     SIGNOUT_SUCCESS(8, "SignOut is successful"),
     LOGIN_IS_THE_SAME(9, "User login is the same"),
     CHANGE_PROFILE_SUCCESS(10, "Profile successfully changed"),
-    REQUEST_FROM_SESSION_SUCCESSFUL(11, "You "),
+    REQUEST_FROM_SESSION_SUCCESSFUL(11, "Success"),
     PASSWORD_NOT_MATCH(12, "Password and password confirmation not match"),
     FIELD_EMPTY(13, "You're not entered some field that should be entered"),
-    SIGNUP_VALIDATION_FAILED(14, "Username should be more than 5 and CAN'T contains '@' but email SHOULD contains '@'");
+    SIGNUP_VALIDATION_FAILED(14, "Username should be more than 5 and CAN'T contains '@' but email SHOULD contains '@'"),
+    CREATE_PROJECT_SUCCESS(15, "Project created successfully"),
+    PROJECT_NOT_EXIST(16, "Project not exist"),
+    NOT_AVAILABLE(17, "Wrong access"),
+    PROJECT_DELETE_SUCCESS(18, "Project deleted successfully"),
+    TASK_DELETE_SUCCESS(19, "Task deleted successfully"),
+    TASK_NOT_EXIST(20, "Task not exist"),
+    COMMENT_DELETE_SUCCESS(21, "Comment successfully deleted"),
+    CREATE_COMMENT_SUCCESS(22, "Comment successfully created");
 
     private final String response;
 

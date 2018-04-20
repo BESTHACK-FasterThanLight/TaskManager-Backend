@@ -9,7 +9,9 @@ CREATE TABLE IF NOT EXISTS comments (
   id serial PRIMARY KEY NOT NULL,
   created TIMESTAMPTZ DEFAULT now(),
   comment_text TEXT NOT NULL,
-  task_id INTEGER REFERENCES task(id) ON DELETE CASCADE NOT NULL
+  task_id INTEGER REFERENCES task(id) ON DELETE CASCADE NOT NULL,
+  author_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL
+  author_login TEXT
 )
 
 CREATE TABLE IF NOT EXISTS projects (
@@ -24,7 +26,9 @@ CREATE TABLE IF NOT EXISTS projects_to_users {
 
 CREATE TABLE IF NOT EXISTS tasks (
   id serial PRIMARY KEY NOT NULL,
-  task_name TEXT NOT NULL,
+  title TEXT NOT NULL,
+  task_text TEXT,
   created TIMESTAMPTZ DEFAULT now(),
+  status INTEGER NOT NULL DEFAULT 0,
   project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE NOT NULL
 )

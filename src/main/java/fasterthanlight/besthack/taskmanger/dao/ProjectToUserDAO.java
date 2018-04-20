@@ -10,4 +10,7 @@ public interface ProjectToUserDAO {
     void setProjectToUser(Integer projectId, Integer userId);
 
     void deleteProjectToUserConnection(Integer projectId, Integer userId);
+
+    Integer isUserHaveAcess(Integer projectId, Integer userId);
+
 }
