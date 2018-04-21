@@ -6,7 +6,6 @@ import fasterthanlight.besthack.taskmanger.models.User;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.lang.Nullable;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.validation.constraints.NotNull;
@@ -18,12 +17,9 @@ import java.util.List;
 public class UserService implements UserDao {
 
     private final JdbcTemplate jdbcTemplate;
-    private final PasswordEncoder encoder;
 
-    public UserService(@NotNull JdbcTemplate jdbcTemplate,
-                       @NotNull PasswordEncoder passwordEncoder) {
+    public UserService(@NotNull JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
-        this.encoder = passwordEncoder;
     }
 
 
@@ -79,34 +75,32 @@ public class UserService implements UserDao {
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
         //noinspection QuestionableName
         final Integer three = 3;
-        final String encryptedPassword = encoder.encode(newUser.getPassword());
         jdbcTemplate.update(con -> {
             final PreparedStatement pst = con.prepareStatement(
                     "insert into users(username, email, password)" + " values(?,?,?)" + " returning id",
                     PreparedStatement.RETURN_GENERATED_KEYS);
             pst.setString(1, newUser.getUsername());
             pst.setString(2, newUser.getEmail());
-            pst.setString(three, encryptedPassword);
+            pst.setString(three, newUser.getPassword());
             return pst;
         }, keyHolder);
         return new User(keyHolder.getKey().intValue(),
-                newUser.getUsername(), newUser.getEmail(), encryptedPassword);
+                newUser.getUsername(), newUser.getEmail(), newUser.getPassword());
     }
 
     @Override
     public @NotNull User updateUserPassword(@NotNull User currentUser, @NotNull String password) {
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
-        final String encryptedPassword = encoder.encode(password);
         jdbcTemplate.update(con -> {
             final PreparedStatement pst = con.prepareStatement(
                     "UPDATE users SET password = ? WHERE id = ?" + " returning id",
                     PreparedStatement.RETURN_GENERATED_KEYS);
-            pst.setString(1, encryptedPassword);
+            pst.setString(1, currentUser.getPassword());
             pst.setInt(2, currentUser.getId());
             return pst;
         }, keyHolder);
         return new User(keyHolder.getKey().intValue(), currentUser.getUsername(),
-                currentUser.getEmail(), encryptedPassword);
+                currentUser.getEmail(), currentUser.getPassword());
     }
 
     @Override

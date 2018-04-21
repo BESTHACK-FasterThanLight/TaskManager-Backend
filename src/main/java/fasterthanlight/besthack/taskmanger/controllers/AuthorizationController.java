@@ -6,7 +6,6 @@ import fasterthanlight.besthack.taskmanger.models.User;
 import fasterthanlight.besthack.taskmanger.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
@@ -16,12 +15,10 @@ import java.util.Objects;
 @RestController
 public class AuthorizationController {
     private final UserService userService;
-    private final PasswordEncoder encoder;
 
-    public AuthorizationController(@NotNull UserService userService, @NotNull PasswordEncoder encoder) {
+    public AuthorizationController(@NotNull UserService userService) {
         super();
         this.userService = userService;
-        this.encoder = encoder;
     }
 
 
@@ -76,7 +73,7 @@ public class AuthorizationController {
 
         final Integer currentUserId = Objects.requireNonNull(currentUser).getId();
 
-        if (!encoder.matches(user.getPassword(), currentUser.getPassword())) {
+        if (!Objects.equals(user.getPassword(), currentUser.getPassword())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(ApiResponse.PASSWORD_INCORRECT.getResponse());
         } else {
@@ -138,7 +135,7 @@ public class AuthorizationController {
             userService.updateUserLogin(currentUser, username);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(ApiResponse.CHANGE_PROFILE_SUCCESS.getResponse());
-        } else if (!encoder.matches(password, lastPassword)) {
+        } else if (!Objects.equals(password, lastPassword)) {
             userService.updateUserPassword(currentUser, password);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(ApiResponse.CHANGE_PROFILE_SUCCESS.getResponse());
