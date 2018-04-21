@@ -21,4 +21,6 @@ public interface TaskDAO {
     Integer isTaskExist(@NotNull Integer taskId);
 
     void deleteTask(@NotNull Integer taskId);
+
+    public void closeTask(int index);
 }

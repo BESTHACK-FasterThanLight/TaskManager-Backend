@@ -1,5 +1,7 @@
 package fasterthanlight.besthack.taskmanger.controllers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fasterthanlight.besthack.taskmanger.dao.ProjectToUserDAO;
 import fasterthanlight.besthack.taskmanger.dao.TaskDAO;
 import fasterthanlight.besthack.taskmanger.models.ApiResponse;
@@ -10,7 +12,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.constraints.NotNull;
+import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @RestController
@@ -21,6 +26,33 @@ public class TaskController {
     public TaskController(TaskDAO taskDAO, ProjectToUserDAO projectToUserDAO) {
         this.taskDAO = taskDAO;
         this.projectToUserDAO = projectToUserDAO;
+    }
+
+    @PostMapping("/git")
+    public ResponseEntity<String> getCommit(String j) throws IOException {
+        if (!j.matches("commit_id") || j.lastIndexOf("\"body\"") == -1) {
+            return ResponseEntity.ok("");
+        }
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        Map<String, Object> map = new HashMap<String, Object>();
+
+        // convert JSON string to Map
+        map = mapper.readValue(j, new TypeReference<Map<String, String>>(){});
+
+        String body = ((Map)map.get("comment")).get("body").toString();
+
+        if (!body.matches("fix task")) {
+            return ResponseEntity.ok("");
+        }
+
+        int index = body.lastIndexOf("#") + 1;
+        int number = Integer.valueOf(body.substring(index));
+
+        taskDAO.closeTask(number);
+
+        return ResponseEntity.ok("OK");
     }
 
     @GetMapping("{projectid}/task/")
@@ -140,4 +172,6 @@ public class TaskController {
 
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.TASK_DELETE_SUCCESS.getResponse());
     }
+
+
 }

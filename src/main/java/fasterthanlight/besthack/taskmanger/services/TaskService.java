@@ -23,6 +23,11 @@ public class TaskService implements TaskDAO {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    @Override
+    public void closeTask(int index) {
+        final String sql = "update into tasks t set t.status = 2 where t.id = ?";
+        jdbcTemplate.update(sql, index);
+    }
 
     @Override
     public @NotNull Task getTaskById(@NotNull Integer taskId) {
