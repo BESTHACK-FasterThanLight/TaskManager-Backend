@@ -15,7 +15,7 @@ USER postgres
 RUN /etc/init.d/postgresql start &&\
     psql --command "CREATE USER besthack WITH SUPERUSER PASSWORD 'besthack';" &&\
     createdb -E UTF8 -T template0 -O besthack besthack &&\
-    /etc/init.d/postgresql stop
+    /etc/init.d/postgresql stopt
 
 # Adjust PostgreSQL configuration so that remote connections to the
 # database are possible.
@@ -47,7 +47,7 @@ WORKDIR $WORK
 RUN mvn package
 
 # port
-EXPOSE 5000
+EXPOSE 8081
 
 #
 # start
