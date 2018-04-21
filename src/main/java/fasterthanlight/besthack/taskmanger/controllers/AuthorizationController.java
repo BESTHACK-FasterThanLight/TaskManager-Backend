@@ -73,7 +73,7 @@ public class AuthorizationController {
 
         final Integer currentUserId = Objects.requireNonNull(currentUser).getId();
 
-        if (!Objects.equals(user.getPassword(), currentUser.getPassword())) {
+        if (!user.getPassword().equals(currentUser.getPassword())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(ApiResponse.PASSWORD_INCORRECT.getResponse());
         } else {
@@ -131,11 +131,11 @@ public class AuthorizationController {
         if (userService.isUsernameExists(username) && !Objects.equals(lastUsername, username)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(ApiResponse.USERNAME_EXIST.getResponse());
-        } else if (!Objects.equals(lastUsername, username)) {
+        } else if (!lastUsername.equals(username)) {
             userService.updateUserLogin(currentUser, username);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(ApiResponse.CHANGE_PROFILE_SUCCESS.getResponse());
-        } else if (!Objects.equals(password, lastPassword)) {
+        } else if (!password.equals(lastPassword)) {
             userService.updateUserPassword(currentUser, password);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(ApiResponse.CHANGE_PROFILE_SUCCESS.getResponse());
