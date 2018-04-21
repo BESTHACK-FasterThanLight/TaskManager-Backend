@@ -3,6 +3,7 @@ package fasterthanlight.besthack.taskmanger.controllers;
 import fasterthanlight.besthack.taskmanger.dao.CommentDAO;
 import fasterthanlight.besthack.taskmanger.dao.ProjectToUserDAO;
 import fasterthanlight.besthack.taskmanger.dao.TaskDAO;
+import fasterthanlight.besthack.taskmanger.dao.UserDao;
 import fasterthanlight.besthack.taskmanger.models.ApiResponse;
 import fasterthanlight.besthack.taskmanger.models.Comment;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,7 @@ public class CommentController {
     private CommentDAO commentDAO;
     private ProjectToUserDAO projectToUserDAO;
     private TaskDAO taskDAO;
+    private UserDao userDao;
 
     public CommentController(CommentDAO commentDAO, ProjectToUserDAO projectToUserDAO, TaskDAO taskDao) {
         this.commentDAO = commentDAO;
@@ -71,6 +73,10 @@ public class CommentController {
         }
 
         commentDAO.setComment(comment);
+        List<Integer> usersIds = projectToUserDAO.getAllUsersIdsByProjectId(taskDAO.getTaskById(taskId).getProjectId());
+        for(Integer id : usersIds) {
+            String email = userDao.getUserById(id).getEmail();
+        }
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.CREATE_COMMENT_SUCCESS.getResponse());
     }
 
