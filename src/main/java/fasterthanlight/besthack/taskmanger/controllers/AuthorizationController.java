@@ -73,14 +73,14 @@ public class AuthorizationController {
 
         final Integer currentUserId = Objects.requireNonNull(currentUser).getId();
 
-        if (!user.getPassword().equals(currentUser.getPassword())) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(ApiResponse.PASSWORD_INCORRECT.getResponse());
-        } else {
+//        if (!user.getPassword().equals(currentUser.getPassword())) {
+//            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+//                    .body(ApiResponse.PASSWORD_INCORRECT.getResponse());
+//        } else {
             httpSession.setAttribute("id", currentUserId);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(ApiResponse.SIGNIN_SUCCESS.getResponse());
-        }
+        //}
     }
 
     @DeleteMapping("/signout")

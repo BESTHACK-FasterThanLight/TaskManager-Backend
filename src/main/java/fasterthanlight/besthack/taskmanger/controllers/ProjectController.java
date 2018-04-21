@@ -32,6 +32,10 @@ public class ProjectController {
                     .body(ApiResponse.USER_NOT_AUTHORIZED.getResponse());
         }
 
+        if(projectDAO.isProjectsExists(userIdInCurrentSession) <= 0){
+            return ResponseEntity.status(HttpStatus.OK).body("Okay");
+        }
+
         final List<Project> projects = Objects.requireNonNull(projectDAO.getAllProjectsByUserId(userIdInCurrentSession));
         return ResponseEntity.status(HttpStatus.OK)
                 .body(projects.toString());

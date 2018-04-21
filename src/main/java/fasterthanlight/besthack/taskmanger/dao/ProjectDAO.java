@@ -8,6 +8,8 @@ import java.util.List;
 public interface ProjectDAO {
     Project getProjectById(Integer id);
 
+    Integer isProjectsExists(Integer id);
+
     Integer setProject(@NotNull Project project);
 
     void deleteProject(@NotNull Integer projectId);

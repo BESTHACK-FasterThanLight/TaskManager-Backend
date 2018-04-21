@@ -33,6 +33,12 @@ public class ProjectService implements ProjectDAO {
     }
 
     @Override
+    public Integer isProjectsExists(Integer id) {
+        final String sql = "SELECT count(*) FROM projects as p JOIN projects_to_users as pu ON (p.id = pu.project_id AND pu.user_id = ?)";
+        return jdbcTemplate.queryForObject(sql, new Object[]{id}, Integer.class);
+    }
+
+    @Override
     public Integer setProject(@NotNull Project newProject) {
 
         final GeneratedKeyHolder keyHolder = new GeneratedKeyHolder();
@@ -59,7 +65,7 @@ public class ProjectService implements ProjectDAO {
 
     @Override
     public List<Project> getAllProjectsByUserId(Integer userId) {
-        final String sql = "SELECT * FROM projects p JOIN projects_to_users pu ON (p.id = pu.id AND u.id = ?)";
+        final String sql = "SELECT * FROM projects as p JOIN projects_to_users as pu ON (p.id = pu.project_id AND pu.user_id = ?)";
         return jdbcTemplate.queryForObject(sql, new Object[]{userId}, (rs, rwNumber) -> {
             List<Project> projects = new ArrayList<>();
             for (int i =0; i < rwNumber; i++){
