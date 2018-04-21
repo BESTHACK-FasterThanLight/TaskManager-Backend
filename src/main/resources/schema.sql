@@ -5,15 +5,6 @@ CREATE TABLE IF NOT EXISTS users (
   password CHARACTER(60) NOT NULL
 );
 
-CREATE TABLE IF NOT EXISTS comments (
-  id serial PRIMARY KEY NOT NULL,
-  created TIMESTAMPTZ DEFAULT now(),
-  comment_text TEXT NOT NULL,
-  task_id INTEGER REFERENCES task(id) ON DELETE CASCADE NOT NULL,
-  author_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL
-  author_login TEXT
-)
-
 CREATE TABLE IF NOT EXISTS projects (
   id serial PRIMARY KEY NOT NULL,
   project_name TEXT NOT NULL
@@ -32,3 +23,14 @@ CREATE TABLE IF NOT EXISTS tasks (
   status INTEGER NOT NULL DEFAULT 0,
   project_id INTEGER REFERENCES projects(id) ON DELETE CASCADE NOT NULL
 )
+
+CREATE TABLE IF NOT EXISTS comments (
+  id serial PRIMARY KEY NOT NULL,
+  created TIMESTAMPTZ DEFAULT now(),
+  comment_text TEXT NOT NULL,
+  task_id INTEGER REFERENCES task(id) ON DELETE CASCADE NOT NULL,
+  author_id INTEGER REFERENCES users(id) ON DELETE CASCADE NOT NULL
+  author_login TEXT
+)
+
+
