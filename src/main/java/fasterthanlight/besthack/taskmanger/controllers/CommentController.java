@@ -8,6 +8,8 @@ import fasterthanlight.besthack.taskmanger.models.ApiResponse;
 import fasterthanlight.besthack.taskmanger.models.Comment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
@@ -23,10 +25,14 @@ public class CommentController {
     private TaskDAO taskDAO;
     private UserDao userDao;
 
-    public CommentController(CommentDAO commentDAO, ProjectToUserDAO projectToUserDAO, TaskDAO taskDao) {
+    private final JavaMailSenderImpl javaMailSender;
+
+    public CommentController(CommentDAO commentDAO, ProjectToUserDAO projectToUserDAO, TaskDAO taskDao, UserDao userDao, JavaMailSenderImpl javaMailSender) {
         this.commentDAO = commentDAO;
         this.projectToUserDAO = projectToUserDAO;
         this.taskDAO = taskDao;
+        this.userDao = userDao;
+        this.javaMailSender = javaMailSender;
     }
 
     @GetMapping("{taskid}/comment/")
@@ -73,9 +79,15 @@ public class CommentController {
         }
 
         commentDAO.setComment(comment);
-        List<Integer> usersIds = projectToUserDAO.getAllUsersIdsByProjectId(taskDAO.getTaskById(taskId).getProjectId());
+        List<Integer> usersIds;
+        usersIds = projectToUserDAO.getAllUsersIdsByProjectId(taskDAO.getTaskById(taskId).getProjectId());
         for(Integer id : usersIds) {
             String email = userDao.getUserById(id).getEmail();
+            SimpleMailMessage message = new SimpleMailMessage();
+            message.setTo(email);
+            message.setSubject("Новый комментарий к задаче");
+            message.setText("К задаче " + taskDAO.getTaskById(taskId).getTitle() + " был добавлен новый комментарий" );
+            javaMailSender.send(message);
         }
         return ResponseEntity.status(HttpStatus.OK).body(ApiResponse.CREATE_COMMENT_SUCCESS.getResponse());
     }
