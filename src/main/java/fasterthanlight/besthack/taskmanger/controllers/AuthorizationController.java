@@ -1,11 +1,15 @@
 package fasterthanlight.besthack.taskmanger.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import fasterthanlight.besthack.taskmanger.configurations.Constants;
 import fasterthanlight.besthack.taskmanger.models.ApiResponse;
 import fasterthanlight.besthack.taskmanger.models.User;
+import fasterthanlight.besthack.taskmanger.models.UserResponse;
 import fasterthanlight.besthack.taskmanger.services.UserService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
@@ -16,9 +20,14 @@ import java.util.Objects;
 public class AuthorizationController {
     private final UserService userService;
 
-    public AuthorizationController(@NotNull UserService userService) {
+    private final PasswordEncoder encoder;
+    private ObjectMapper objectMapper;
+
+    public AuthorizationController(@NotNull UserService userService, PasswordEncoder encoder, ObjectMapper objectMapper) {
         super();
         this.userService = userService;
+        this.encoder = encoder;
+        this.objectMapper = objectMapper;
     }
 
 
@@ -73,14 +82,13 @@ public class AuthorizationController {
 
         final Integer currentUserId = Objects.requireNonNull(currentUser).getId();
 
-//        if (!user.getPassword().equals(currentUser.getPassword())) {
-//            return ResponseEntity.status(HttpStatus.FORBIDDEN)
-//                    .body(ApiResponse.PASSWORD_INCORRECT.getResponse());
-//        } else {
-            httpSession.setAttribute("id", currentUserId);
-            return ResponseEntity.status(HttpStatus.OK)
-                    .body(ApiResponse.SIGNIN_SUCCESS.getResponse());
-        //}
+        if (!encoder.matches(user.getPassword(), currentUser.getPassword())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(ApiResponse.PASSWORD_INCORRECT.getResponse());
+        }
+        httpSession.setAttribute("id", currentUserId);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.SIGNIN_SUCCESS.getResponse());
     }
 
     @DeleteMapping("/signout")
@@ -96,7 +104,7 @@ public class AuthorizationController {
                 .body(ApiResponse.SIGNOUT_SUCCESS.getResponse());
     }
 
-    @PostMapping("/session")
+    @GetMapping("/session")
     public @NotNull ResponseEntity<String> requestUserInCurrentSession(@NotNull HttpSession httpSession) {
         final Integer userIdInCurrentSession = (Integer) httpSession.getAttribute("id");
 
@@ -107,8 +115,13 @@ public class AuthorizationController {
 
         final User user = Objects.requireNonNull(userService
                 .getUserById(userIdInCurrentSession));
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(user.toString());
+        try {
+            return ResponseEntity.status(HttpStatus.OK)
+                    .body(objectMapper.writeValueAsString(new UserResponse(user.getUsername(), user.getEmail())));
+        } catch (JsonProcessingException e) {
+            e.printStackTrace();
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ApiResponse.INTERNAL_ERROR.getResponse());
     }
 
     @PutMapping("/settings")
@@ -135,7 +148,7 @@ public class AuthorizationController {
             userService.updateUserLogin(currentUser, username);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(ApiResponse.CHANGE_PROFILE_SUCCESS.getResponse());
-        } else if (!password.equals(lastPassword)) {
+        } else if (!encoder.matches(password, lastPassword)) {
             userService.updateUserPassword(currentUser, password);
             return ResponseEntity.status(HttpStatus.OK)
                     .body(ApiResponse.CHANGE_PROFILE_SUCCESS.getResponse());

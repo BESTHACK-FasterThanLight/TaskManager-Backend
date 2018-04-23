@@ -25,7 +25,8 @@ public enum ApiResponse {
     TASK_DELETE_SUCCESS(19, "Task deleted successfully"),
     TASK_NOT_EXIST(20, "Task not exist"),
     COMMENT_DELETE_SUCCESS(21, "Comment successfully deleted"),
-    CREATE_COMMENT_SUCCESS(22, "Comment successfully created");
+    CREATE_COMMENT_SUCCESS(22, "Comment successfully created"),
+    INTERNAL_ERROR(23, "Internal error");
 
     private final String response;
 
